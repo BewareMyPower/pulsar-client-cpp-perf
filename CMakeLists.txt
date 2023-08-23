@@ -33,7 +33,13 @@ if (NOT PULSAR_INCLUDE_DIR OR NOT PULSAR_LIBRARIES)
     message(FATAL_ERROR "Failed to find libpulsar")
 endif ()
 
+find_package(Boost REQUIRED COMPONENTS program_options)
+message(STATUS "Boost_PROGRAM_OPTIONS_LIBRARY: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
+
+find_package(Threads REQUIRED)
+MESSAGE(STATUS "Threads library: " ${CMAKE_THREAD_LIBS_INIT})
+
 include_directories(${PULSAR_INCLUDE_DIR})
 
-add_library(perfProducer PerfProducer.cc)
-target_link_libraries(perfProducer PRIVATE ${PULSAR_LIBRARIES})
+add_executable(perfProducer PerfProducer.cc)
+target_link_libraries(perfProducer PRIVATE ${PULSAR_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
