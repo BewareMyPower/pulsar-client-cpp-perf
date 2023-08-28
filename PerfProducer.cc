@@ -384,6 +384,7 @@ int main(int argc, char** argv) {
         pulsar::AuthenticationPtr auth = pulsar::AuthFactory::create(args.authPlugin, args.authParams);
         conf.setAuth(auth);
     }
+    conf.setStatsIntervalInSeconds(0);
 
     pulsar::Client client(pulsar::PulsarFriend::getClient(args.serviceURL, conf, args.poolConnections));
 
