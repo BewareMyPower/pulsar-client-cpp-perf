@@ -126,18 +126,6 @@ typedef std::unique_lock<std::mutex> Lock;
 
 typedef std::chrono::high_resolution_clock Clock;
 
-void sendCallback(pulsar::Result result, const pulsar::MessageId& msgId, size_t msgLength,
-                  Clock::time_point& publishTime) {
-    LOG_DEBUG("result = " << result);
-    assert(result == pulsar::ResultOk);
-    uint64_t latencyUsec =
-        std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - publishTime).count();
-    Lock lock(mutex);
-    ++messagesProduced;
-    bytesProduced += msgLength;
-    e2eLatencyAccumulator(latencyUsec);
-}
-
 // Start a pulsar producer on a topic and keep producing messages
 void runProducer(const Arguments& args, std::string topicName, int threadIndex, RateLimiterPtr limiter,
                  pulsar::Producer& producer, const std::atomic<bool>& exitCondition) {
@@ -153,8 +141,20 @@ void runProducer(const Arguments& args, std::string topicName, int threadIndex, 
         }
         pulsar::Message msg = builder.create().setAllocatedContent(payload.get(), args.msgSize).build();
 
-        producer.sendAsync(msg, std::bind(sendCallback, std::placeholders::_1, std::placeholders::_2,
-                                          msg.getLength(), Clock::now()));
+        auto publishTime = Clock::now();
+        auto msgLength = msg.getLength();
+        producer.sendAsync(msg, [publishTime, msgLength](Result result, const MessageId& msgId) {
+            if (result == ResultOk) {
+                auto latencyUsec =
+                    std::chrono::duration_cast<std::chrono::microseconds>(Clock::now() - publishTime).count();
+                Lock lock(mutex);
+                ++messagesProduced;
+                bytesProduced += msgLength;
+                e2eLatencyAccumulator(latencyUsec);
+            } else {
+                LOG_ERROR("Failed to send: " << result);
+            }
+        });
         if (exitCondition) {
             LOG_INFO("Thread interrupted. Exiting producer thread.");
             break;
