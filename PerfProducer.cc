@@ -70,19 +70,20 @@ struct Arguments {
     std::string compression;
 };
 
+using namespace boost::accumulators;
+using namespace pulsar;
+
 namespace pulsar {
 class PulsarFriend {
    public:
-    static Client getClient(const std::string& url, const ClientConfiguration conf, bool poolConnections) {
-        return Client(url, conf, poolConnections);
+    static Client getClient(const std::string& url, const ClientConfiguration conf) {
+        return Client(url, conf);
     }
 };
 }  // namespace pulsar
 
 unsigned long messagesProduced;
 unsigned long bytesProduced;
-using namespace boost::accumulators;
-using namespace pulsar;
 
 class EncKeyReader : public CryptoKeyReader {
    private:
@@ -121,7 +122,7 @@ LatencyAccumulator e2eLatencyAccumulator(quantile_probability = 0.99);
 std::vector<pulsar::Producer> producerList;
 std::vector<std::thread> threadList;
 
-std::mutex mutex;
+static std::mutex mutex;
 typedef std::unique_lock<std::mutex> Lock;
 
 typedef std::chrono::high_resolution_clock Clock;
@@ -386,7 +387,7 @@ int main(int argc, char** argv) {
     }
     conf.setStatsIntervalInSeconds(0);
 
-    pulsar::Client client(pulsar::PulsarFriend::getClient(args.serviceURL, conf, args.poolConnections));
+    pulsar::Client client(pulsar::PulsarFriend::getClient(args.serviceURL, conf));
 
     std::atomic<bool> exitCondition(false);
     startPerfProducer(args, producerConf, client, exitCondition);

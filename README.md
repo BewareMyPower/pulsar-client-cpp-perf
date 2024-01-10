@@ -12,8 +12,19 @@ Though you can also build the tool in the [official repository](https://github.c
 
 ## Build
 
+First, clone this repo with all submodules.
+
 ```bash
-cmake -B build
+git clone https://github.com/BewareMyPower/pulsar-client-cpp-perf.git
+git submodule update --init --recursive
+```
+
+Then, build the tool with vcpkg.
+
+```bash
+cd pulsar-client-cpp-perf
+# CMAKE_BUILD_TYPE is required for now, there is a bug in pulsar-client-cpp's port
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
@@ -29,3 +40,11 @@ Run `./build/perfProducer` for how to use it. For example, the following command
   --max-batch-publish-delay-in-ms=1 \
   my-topic
 ```
+
+## Verify the version
+
+Modify [vcpkg.json](./vcpkg.json) to test another version of `pulsar-client-cpp`.
+
+> **Note**:
+>
+> Currently only 3.4.2 is available in vcpkg.

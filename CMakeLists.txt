@@ -17,29 +17,19 @@
 # under the License.
 #
 
-cmake_minimum_required(VERSION 3.10)
-project(protobuf-demo CXX)
+cmake_minimum_required(VERSION 3.15)
+
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
+project(pulsar-client-cpp-perf CXX)
 
 if (NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 17)
 endif ()
 
-find_path(PULSAR_INCLUDE_DIR pulsar/Client.h)
-find_library(PULSAR_LIBRARIES pulsar)
-message(STATUS "PULSAR_INCLUDE_DIR: ${PULSAR_INCLUDE_DIR}")
-message(STATUS "PULSAR_LIBRARIES: ${PULSAR_LIBRARIES}")
-
-if (NOT PULSAR_INCLUDE_DIR OR NOT PULSAR_LIBRARIES)
-    message(FATAL_ERROR "Failed to find libpulsar")
-endif ()
-
+find_package(unofficial-pulsar CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS program_options)
-message(STATUS "Boost_PROGRAM_OPTIONS_LIBRARY: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
-
 find_package(Threads REQUIRED)
-MESSAGE(STATUS "Threads library: " ${CMAKE_THREAD_LIBS_INIT})
-
-include_directories(${PULSAR_INCLUDE_DIR})
 
 add_executable(perfProducer PerfProducer.cc)
-target_link_libraries(perfProducer PRIVATE ${PULSAR_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(perfProducer PRIVATE unofficial::pulsar::pulsar Boost::program_options Threads::Threads)

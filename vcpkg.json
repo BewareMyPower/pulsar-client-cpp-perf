@@ -1,0 +1,16 @@
+{
+  "name": "pulsar-client-cpp-perf",
+  "version": "1.0.0",
+  "description": "Pulsar C++ SDK",
+  "builtin-baseline": "c9919121dde6f61c0436adda94624636e041226b",
+  "dependencies": [
+    {
+      "name": "boost-program-options",
+      "version>=": "1.83.0"
+    },
+    {
+      "name": "pulsar-client-cpp",
+      "version>=": "3.4.2"
+    }
+  ]
+}
