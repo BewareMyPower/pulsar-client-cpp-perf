@@ -33,3 +33,6 @@ find_package(Threads REQUIRED)
 
 add_executable(perfProducer PerfProducer.cc)
 target_link_libraries(perfProducer PRIVATE unofficial::pulsar::pulsar Boost::program_options Threads::Threads)
+
+add_executable(stress_producer_tool stress_producer_tool.cc)
+target_link_libraries(stress_producer_tool PRIVATE unofficial::pulsar::pulsar)

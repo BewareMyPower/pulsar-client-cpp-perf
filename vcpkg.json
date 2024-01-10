@@ -5,6 +5,10 @@
   "builtin-baseline": "c9919121dde6f61c0436adda94624636e041226b",
   "dependencies": [
     {
+      "name": "asio",
+      "version>=": "1.28.2"
+    },
+    {
       "name": "boost-program-options",
       "version>=": "1.83.0"
     },
