@@ -1,3 +1,4 @@
 [submodule "vcpkg"]
 	path = vcpkg
-	url = https://github.com/microsoft/vcpkg.git
+	url = https://github.com/BewareMyPower/vcpkg.git
+    branch = fix-pulsar-find-library

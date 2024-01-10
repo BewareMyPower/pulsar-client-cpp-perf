@@ -2,7 +2,7 @@
   "name": "pulsar-client-cpp-perf",
   "version": "1.0.0",
   "description": "Pulsar C++ SDK",
-  "builtin-baseline": "c9919121dde6f61c0436adda94624636e041226b",
+  "builtin-baseline": "4e110041b283c6f22223b8fa108630164a67652c",
   "dependencies": [
     {
       "name": "asio",
