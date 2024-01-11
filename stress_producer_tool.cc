@@ -1,8 +1,10 @@
 #include <pulsar/Client.h>
 
+#include <algorithm>
 #include <asio/post.hpp>
 #include <asio/thread_pool.hpp>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <string>
 #include <thread>
@@ -15,6 +17,22 @@
 DECLARE_LOG_OBJECT()
 
 using namespace pulsar;
+
+static auto to_log_level(std::string level) {
+    std::transform(level.cbegin(), level.cend(), level.begin(), [](char ch) { return std::tolower(ch); });
+    if (level == "info") {
+        return Logger::LEVEL_INFO;
+    } else if (level == "warn") {
+        return Logger::LEVEL_WARN;
+    } else if (level == "error") {
+        return Logger::LEVEL_ERROR;
+    } else if (level == "debug") {
+        return Logger::LEVEL_DEBUG;
+    } else {
+        std::cout << "Unknown log level: " << level << ", use LEVEL_INFO" << std::endl;
+        return Logger::LEVEL_INFO;
+    }
+}
 
 int main(int argc, char *argv[]) {
     const auto config_path = argc > 1 ? argv[1] : "/etc/pulsar/config.ini";
@@ -36,8 +54,11 @@ int main(int argc, char *argv[]) {
     ClientConfiguration conf;
     conf.setIOThreads(std::thread::hardware_concurrency());
     conf.setConnectionsPerBroker(connections_per_broker);
-    if (!log_path.empty()) {
-        conf.setLogger(new FileLoggerFactory(Logger::LEVEL_INFO, log_path));
+    const auto level = to_log_level(configs.get_or_else<std::string>("log_level", "info"));
+    if (log_path.empty()) {
+        conf.setLogger(new ConsoleLoggerFactory(level));
+    } else {
+        conf.setLogger(new FileLoggerFactory(level, log_path));
     }
     if (!tls_trust_certs_file_path.empty()) {
         conf.setTlsTrustCertsFilePath(tls_trust_certs_file_path);
